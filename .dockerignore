@@ -1,0 +1,4 @@
+public/data/*.json
+node_modules
+.git
+README.md

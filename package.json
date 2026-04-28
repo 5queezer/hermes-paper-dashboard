@@ -1,0 +1,1 @@
+{"scripts":{"collect":"node scripts/collect_dashboard_snapshot.mjs","test":"node tests/test_dashboard_collector.mjs"},"dependencies":{"pg":"^8.13.1"},"devDependencies":{}}

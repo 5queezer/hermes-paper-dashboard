@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hermes Paper Trader Dashboard</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Hermes paper/research mode</p>
+      <h1>Paper Trader Dashboard</h1>
+    </div>
+    <div class="status-pill" id="freshness">Loading…</div>
+  </header>
+
+  <main>
+    <section class="notice">
+      <strong>Paper only.</strong> This dashboard is read-only and does not place broker/exchange orders.
+    </section>
+
+    <section class="grid cards" id="summary-cards"></section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>PnL curve</h2>
+        <span id="pnl-caption"></span>
+      </div>
+      <canvas id="pnl-chart" width="1200" height="320"></canvas>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header"><h2>Risk caps</h2><span>Hard caps before new paper-trade inserts</span></div>
+      <div class="caps" id="risk-caps"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header"><h2>Bucket expectancy</h2><span>v2 kill/promote metrics</span></div>
+      <div class="table-wrap"><table id="bucket-metrics"></table></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header"><h2>Open positions</h2><span id="positions-caption"></span></div>
+      <div class="table-wrap"><table id="open-positions"></table></div>
+    </section>
+
+    <section class="panel two-col">
+      <div>
+        <div class="panel-header"><h2>Trade history</h2><span>Latest closed trades</span></div>
+        <div class="table-wrap"><table id="trade-history"></table></div>
+      </div>
+      <div>
+        <div class="panel-header"><h2>Scanner runs</h2><span>Latest scans</span></div>
+        <div class="table-wrap"><table id="scan-runs"></table></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header"><h2>TradingView alerts</h2><span>Latest webhook alerts</span></div>
+      <div class="table-wrap"><table id="alerts"></table></div>
+    </section>
+  </main>
+</body>
+</html>
