@@ -46,8 +46,10 @@ function renderTables(s) {
   table('#bucket-metrics', [
     {key:'bucket', label:'Bucket'}, {key:'sample_size', label:'N'}, {key:'win_rate', label:'Win rate', render:v=>`${num(Number(v)*100)}%`},
     {key:'expectancy_r', label:'Expectancy', render:v=>`<span class="${cls(v)}">${num(v)}R</span>`},
+    {key:'metrics_excluded_count', label:'Excluded', render:v=>v ? `${v} cleanup` : '—'},
     {key:'avg_mfe_r', label:'MFE', render:v=>v == null ? '—' : `${num(v)}R`}, {key:'avg_mae_r', label:'MAE', render:v=>v == null ? '—' : `${num(v)}R`},
     {key:'avg_hold_hours', label:'Hold h', render:v=>v == null ? '—' : num(v)}, {key:'auto_open_enabled', label:'Auto-open', render:v=>v ? '<span class="good">enabled</span>' : '<span class="bad">disabled</span>'},
+    {key:'promotion_sample_shortfall', label:'Sample gate', render:(v,row)=>row.promotion_sample_ready ? '<span class="good">ready</span>' : `${v} to 30`},
     {key:'promotion_eligible', label:'Promote', render:v=>v ? '<span class="good">yes</span>' : 'no'},
   ], bucketRows, 'No bucket metrics yet');
 

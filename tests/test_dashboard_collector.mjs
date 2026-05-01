@@ -47,6 +47,21 @@ const rows = {
       strategy_bucket: 'trend_continuation',
       opened_at: '2026-04-25T12:00:00.000Z',
       closed_at: '2026-04-25T13:00:00.000Z'
+    },
+    {
+      id: 'trade-duplicate-cleanup',
+      symbol: 'STNG',
+      side: 'long',
+      planned_entry: '40',
+      position_size: '1',
+      realized_pnl: '0',
+      realized_r: '0',
+      outcome_label: null,
+      exit_reason: 'duplicate_open_closed_after_dedupe_fix',
+      setup_type: 'geopolitical_tanker_momentum',
+      strategy_bucket: 'geopolitical_tanker_momentum',
+      opened_at: '2026-04-25T12:00:00.000Z',
+      closed_at: '2026-04-25T13:00:00.000Z'
     }
   ],
   scanRuns: [
@@ -76,7 +91,7 @@ const snapshot = buildDashboardSnapshot(rows, { generatedAt: '2026-04-26T12:00:0
 assert.equal(snapshot.summary.mode, 'paper');
 assert.equal(snapshot.summary.no_real_trades, true);
 assert.equal(snapshot.summary.open_trades, 1);
-assert.equal(snapshot.summary.closed_trades, 2);
+assert.equal(snapshot.summary.closed_trades, 3);
 assert.equal(snapshot.summary.open_notional_usd, 20);
 assert.equal(snapshot.summary.open_unrealized_pnl_usd, 0.8);
 assert.equal(snapshot.summary.realized_pnl_usd, -0.5);
@@ -95,4 +110,8 @@ assert.equal(snapshot.bucket_metrics.breakout_watchlist.expectancy_r, -1);
 assert.equal(snapshot.bucket_metrics.breakout_watchlist.auto_open_enabled, false);
 assert.equal(snapshot.bucket_metrics.trend_continuation.win_rate, 1);
 assert.equal(snapshot.bucket_metrics.trend_continuation.expectancy_r, 0.5);
+assert.equal(snapshot.bucket_metrics.geopolitical_tanker_momentum.sample_size, 0);
+assert.equal(snapshot.bucket_metrics.geopolitical_tanker_momentum.metrics_excluded_count, 1);
+assert.equal(snapshot.bucket_metrics.breakout_confirmed.promotion_sample_ready, false);
+assert.equal(snapshot.bucket_metrics.breakout_confirmed.promotion_sample_shortfall, 30);
 console.log('dashboard_collector_test=passed');

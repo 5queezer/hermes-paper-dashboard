@@ -93,15 +93,45 @@ function bucketFor(row) {
   return bucket === 'breakout' ? 'breakout_watchlist' : bucket;
 }
 
+function isMetricsExcluded(row) {
+  const exitReason = String(row.exit_reason || '').toLowerCase();
+  const outcome = String(row.outcome_label || '').toLowerCase();
+  return exitReason.includes('duplicate_open_closed_after_dedupe_fix') || outcome === 'duplicate_cleanup';
+}
+
+function newBucketMetric(bucket, autoOpenDefault = true) {
+  return {
+    bucket,
+    sample_size: 0,
+    metrics_excluded_count: 0,
+    wins: 0,
+    losses: 0,
+    win_rate: 0,
+    expectancy_r: 0,
+    avg_mfe_r: null,
+    avg_mae_r: null,
+    avg_hold_hours: null,
+    auto_open_enabled: autoOpenDefault,
+    promotion_eligible: false,
+    promotion_min_sample: 30,
+    promotion_sample_ready: false,
+    promotion_sample_shortfall: 30,
+  };
+}
+
 function buildBucketMetrics(closedTrades) {
   const buckets = {};
   for (const b of ['trend_continuation', 'breakout_watchlist', 'breakout_confirmed', 'high_rvol_experimental']) {
-    buckets[b] = { bucket: b, sample_size: 0, wins: 0, losses: 0, win_rate: 0, expectancy_r: 0, avg_mfe_r: null, avg_mae_r: null, avg_hold_hours: null, auto_open_enabled: b !== 'breakout_watchlist' && b !== 'high_rvol_experimental', promotion_eligible: false };
+    buckets[b] = newBucketMetric(b, b !== 'breakout_watchlist' && b !== 'high_rvol_experimental');
   }
   for (const row of closedTrades || []) {
     const b = bucketFor(row);
-    buckets[b] ||= { bucket: b, sample_size: 0, wins: 0, losses: 0, win_rate: 0, expectancy_r: 0, avg_mfe_r: null, avg_mae_r: null, avg_hold_hours: null, auto_open_enabled: true, promotion_eligible: false };
+    buckets[b] ||= newBucketMetric(b, true);
     const m = buckets[b];
+    if (isMetricsExcluded(row)) {
+      m.metrics_excluded_count += 1;
+      continue;
+    }
     const r = n(row.realized_r ?? row.r_multiple);
     m.sample_size += 1;
     m.expectancy_r += r;
@@ -118,9 +148,11 @@ function buildBucketMetrics(closedTrades) {
       m.avg_mae_r = round((m._mae || 0) / m.sample_size, 2);
       m.avg_hold_hours = round((m._hold || 0) / m.sample_size, 2);
     }
+    m.promotion_sample_ready = m.sample_size >= m.promotion_min_sample;
+    m.promotion_sample_shortfall = Math.max(0, m.promotion_min_sample - m.sample_size);
     if (m.sample_size >= 10 && m.expectancy_r < -0.25) m.auto_open_enabled = false;
     if (m.sample_size < 30 && (m.bucket === 'breakout_watchlist' || m.bucket === 'high_rvol_experimental')) m.auto_open_enabled = false;
-    if (m.sample_size >= 30 && m.expectancy_r > 0) { m.promotion_eligible = true; m.auto_open_enabled = m.bucket !== 'breakout_watchlist'; }
+    if (m.promotion_sample_ready && m.expectancy_r > 0) { m.promotion_eligible = true; m.auto_open_enabled = m.bucket !== 'breakout_watchlist'; }
     delete m._mfe; delete m._mae; delete m._hold;
   }
   return buckets;
